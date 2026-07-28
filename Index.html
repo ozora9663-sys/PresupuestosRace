@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuesto Race</title>
+    <style>
+        :root {
+            --primary-blue: #0f4c81;
+            --accent-blue: #1b6ca8;
+            --light-blue: #e8f1f5;
+            --success-green: #2ecc71;
+            --dark-green: #27ae60;
+            --error-red: #e74c3c;
+            --text-dark: #2c3e50;
+            --bg-light: #f4f7f6;
+            --card-white: #ffffff;
+            --shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 15px 30px rgba(0, 0, 0, 0.15);
+            --border-radius: 16px;
+            --transition-smooth: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .game-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--card-white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-soft);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            min-height: 550px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 100%;
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-blue);
+            margin-bottom: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 320px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-blue));
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            box-shadow: 0 4px 12px rgba(15, 76, 129, 0.2);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-hover);
+            background: linear-gradient(135deg, var(--accent-blue), var(--primary-blue));
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            box-shadow: none;
+        }
+
+        .info-card {
+            background: var(--light-blue);
+            border-radius: 12px;
+            padding: 25px;
+            text-align: left;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .info-card h3 {
+            color: var(--primary-blue);
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+
+        .info-card h3:first-child {
+            margin-top: 0;
+        }
+
+        .info-card ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .info-card li {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .info-card li::before {
+            content: "\2714";
+            position: absolute;
+            left: 0;
+            color: var(--dark-green);
+            font-weight: bold;
+        }
+
+        .hud {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            background: var(--light-blue);
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: var(--primary-blue);
+            font-size: 1.1rem;
+        }
+
+        .hud-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hearts {
+            color: var(--error-red);
+            letter-spacing: 2px;
+            font-size: 1.3rem;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--success-green));
+            transition: width 0.4s ease;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(11, 1fr);
+            gap: 6px;
+            width: 100%;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .tile {
+            background: #e0e6ed;
+            border-radius: 8px;
+            padding: 10px 2px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #7f8c8d;
+            text-align: center;
+            position: relative;
+            transition: var(--transition-smooth);
+            border: 2px solid transparent;
+        }
+
+        .tile.active {
+            border-color: var(--accent-blue);
+            background: #d4e6f1;
+            color: var(--primary-blue);
+            animation: pulse-active-tile 1s infinite alternate;
+        }
+
+        @keyframes pulse-active-tile {
+            from { box-shadow: 0 0 0 0px rgba(27, 108, 168, 0.7); }
+            to { box-shadow: 0 0 0 8px rgba(27, 108, 168, 0); }
+        }
+
+        .tile.completed {
+            background: var(--success-green);
+            color: white;
+        }
+
+        .tile.start-tile {
+            background: #bdc3c7;
+            color: #2c3e50;
+        }
+
+        .tile.finish-tile {
+            background: #f1c40f;
+            color: #d35400;
+        }
+
+        .player-token {
+            width: 28px;
+            height: 28px;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            transition: transform 0.4s ease;
+            z-index: 10;
+        }
+
+        .quiz-container {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #e1e8ed;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            margin-bottom: 15px;
+            position: relative;
+        }
+
+        .timer-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
+            font-weight: bold;
+            color: #e67e22;
+            margin-bottom: 10px;
+            font-size: 0.95rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+
+        .option-btn {
+            background: var(--bg-light);
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 20px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            text-align: left;
+            transition: var(--transition-smooth);
+            font-weight: 600;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent-blue);
+            background: var(--light-blue);
+        }
+
+        .option-btn.correct {
+            background: #d4edda !important;
+            border-color: var(--success-green) !important;
+            color: #155724 !important;
+        }
+
+        .option-btn.incorrect {
+            background: #f8d7da !important;
+            border-color: var(--error-red) !important;
+            color: #721c24 !important;
+        }
+
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-height: 25px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .feedback.show {
+            opacity: 1;
+        }
+
+        .feedback.correct-text {
+            color: var(--dark-green);
+        }
+
+        .feedback.incorrect-text {
+            color: var(--error-red);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .quiz-container.shake-animation {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .confetti-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 99;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            background: #ffd700;
+            top: -20px;
+            opacity: 0.8;
+            animation: fall 3s linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(600px) rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 15px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .board {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 4px;
+            }
+
+            .tile {
+                font-size: 0.65rem;
+                padding: 8px 1px;
+            }
+
+            .hud {
+                font-size: 0.85rem;
+                padding: 10px;
+            }
+
+            .question-text {
+                font-size: 1rem;
+            }
+
+            .option-btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="game-container">
+        <div id="confetti" class="confetti-container"></div>
+
+        <div id="screen-main" class="screen active">
+            <h1>PRESUPUESTO RACE</h1>
+            <p class="subtitle">Demuestra tu conocimiento financiero y llega a la meta</p>
+            <div class="btn-group">
+                <button class="btn" onclick="startGame()">Iniciar juego</button>
+                <button class="btn btn-secondary" onclick="showScreen('screen-instructions')">Instrucciones</button>
+                <button class="btn btn-secondary" onclick="showScreen('screen-credits')">Créditos</button>
+            </div>
+        </div>
+
+        <div id="screen-instructions" class="screen">
+            <h2>Instrucciones</h2>
+            <div class="info-card">
+                <h3>Objetivo del juego</h3>
+                <p>Responder correctamente las preguntas de presupuestos para avanzar por el tablero hasta alcanzar la Meta.</p>
+
+                <h3>Reglas</h3>
+                <ul>
+                    <li>Cada respuesta correcta te permite avanzar 1 casilla y suma 10 puntos.</li>
+                    <li>Cada respuesta incorrecta (o agotamiento del tiempo) te resta una vida.</li>
+                    <li>Cuentas con <strong>3 vidas</strong> y <strong>30 segundos</strong> por pregunta.</li>
+                    <li>Si fallas, puedes volver a intentar la pregunta hasta lograrlo (siempre que tengas vidas).</li>
+                    <li>Gana el jugador que logre completar el recorrido de 10 casillas.</li>
+                </ul>
+            </div>
+            <button class="btn" onclick="showScreen('screen-main')">Volver al menú</button>
+        </div>
+
+        <div id="screen-credits" class="screen">
+            <h2>Información</h2>
+            <div class="info-card" style="text-align: center;">
+                <h3>Proyecto: Presupuesto Race</h3>
+                <p style="margin-bottom: 15px;">Aplicación educativa diseñada para el aprendizaje interactivo.</p>
+                <p><strong>Autor:</strong></p>
+                <p style="font-size: 1.4rem; color: var(--primary-blue); font-weight: bold; margin: 10px 0;">Grupo 12</p>
+                <p><strong>Versión:</strong> 1.0.0</p>
+                <p>© 2026 - Todos los derechos reservados UPT </p>
+            </div>
+            <button class="btn" onclick="showScreen('screen-main')">Volver al menú</button>
+        </div>
+
+        <div id="screen-game" class="screen">
+            <div class="hud">
+                <div class="hud-item">Vidas: <span id="hearts-display" class="hearts">&#x2764;&#xFE0F;&#x2764;&#xFE0F;&#x2764;&#xFE0F;</span></div>
+                <div class="hud-item">Puntos: <span id="score-display">0</span></div>
+                <div class="hud-item"><button class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;" onclick="resetGame()">Reiniciar</button></div>
+            </div>
+
+            <div class="progress-bar-container">
+                <div id="progress-fill" class="progress-bar-fill"></div>
+            </div>
+
+            <div class="board" id="board">
+                <div id="player-token" class="player-token">&#x1F3CE;</div>
+                <div class="tile start-tile active" id="tile-0">
+                    Inicio
+                </div>
+                <div class="tile" id="tile-1">C1</div>
+                <div class="tile" id="tile-2">C2</div>
+                <div class="tile" id="tile-3">C3</div>
+                <div class="tile" id="tile-4">C4</div>
+                <div class="tile" id="tile-5">C5</div>
+                <div class="tile" id="tile-6">C6</div>
+                <div class="tile" id="tile-7">C7</div>
+                <div class="tile" id="tile-8">C8</div>
+                <div class="tile" id="tile-9">C9</div>
+                <div class="tile finish-tile" id="tile-10">Meta</div>
+            </div>
+
+            <div class="quiz-container">
+                <div class="timer-container">
+                    &#x23F1;&#xFE0F; Tiempo: <span id="timer-display">30</span>s
+                </div>
+                <div class="question-text" id="question-text">Cargando pregunta...</div>
+                <div class="options-grid" id="options-grid">
+                </div>
+            </div>
+
+            <div id="feedback-message" class="feedback"></div>
+        </div>
+
+        <div id="screen-end" class="screen">
+            <h1 id="end-title">&#x1F3C6; &#xA1;Felicidades!</h1>
+            <p class="subtitle" id="end-message">Has administrado correctamente el presupuesto de la empresa.</p>
+            <div class="info-card" style="text-align: center;">
+                <h3>Puntuación final</h3>
+                <p id="final-score" style="font-size: 2.5rem; font-weight: bold; color: var(--success-green);">0 PTS</p>
+            </div>
+            <button class="btn" onclick="startGame()">Jugar otra vez</button>
+            <button class="btn btn-secondary" style="margin-top: 10px;" onclick="showScreen('screen-main')">Volver al menú</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "&#xBF;Qué es un presupuesto?",
+                options: [
+                    "Un documento para planear ingresos y gastos",
+                    "Una factura",
+                    "Un préstamo"
+                ],
+                correct: 0
+            },
+            {
+                question: "&#xBF;Cuál es un costo fijo?",
+                options: [
+                    "Materia prima",
+                    "Renta del local",
+                    "Comisiones por ventas"
+                ],
+                correct: 1
+            },
+            {
+                question: "&#xBF;Qué es un costo variable?",
+                options: [
+                    "Salario del gerente",
+                    "Publicidad anual",
+                    "Materiales de producción"
+                ],
+                correct: 2
+            },
+            {
+                question: "&#xBF;Cuál de los siguientes NO es un tipo de presupuesto común?",
+                options: [
+                    "Presupuesto de Ventas",
+                    "Presupuesto de Compras",
+                    "Presupuesto de Sentimientos"
+                ],
+                correct: 2
+            },
+            {
+                question: "El punto de equilibrio es cuando:",
+                options: [
+                    "Los ingresos son mayores que los gastos",
+                    "Los ingresos son iguales a los gastos",
+                    "Los ingresos son menores que los gastos"
+                ],
+                correct: 1
+            },
+            {
+                question: "&#xBF;Qué significa 'ROI' en finanzas?",
+                options: [
+                    "Rentabilidad Operativa Inmediata",
+                    "Retorno de la Inversión",
+                    "Rango de Interés Operativo"
+                ],
+                correct: 1
+            },
+            {
+                question: "&#xBF;Cuál es la función principal de un presupuesto?",
+                options: [
+                    "Distribuir dividendos a los accionistas",
+                    "Planificar y controlar los recursos financieros",
+                    "Calcular impuestos a pagar"
+                ],
+                correct: 1
+            },
+            {
+                question: "Si los gastos superan a los ingresos, se produce un:",
+                options: [
+                    "Superávit presupuestario",
+                    "Déficit presupuestario",
+                    "Equilibrio financiero"
+                ],
+                correct: 1
+            },
+            {
+                question: "&#xBF;Qué elemento es crucial para una buena gestión presupuestaria?",
+                options: [
+                    "Gastar sin control",
+                    "La planificación y el seguimiento constante",
+                    "Evitar el ahorro"
+                ],
+                correct: 1
+            },
+            {
+                question: "Un presupuesto maestro integra:",
+                options: [
+                    "Solo el presupuesto de ventas",
+                    "Todos los presupuestos operativos y financieros de una empresa",
+                    "Únicamente el presupuesto de capital"
+                ],
+                correct: 1
+            }
+        ];
+
+        let currentScreen = 'screen-main';
+        let playerPosition = 0;
+        let score = 0;
+ 
