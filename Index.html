@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Presupuesto Race</title>
     <style>
+        /* ==========================================================================
+           1. VARIABLES GLOBALES Y RESET
+           ========================================================================== */
         :root {
             --primary-blue: #0f4c81;
             --accent-blue: #1b6ca8;
@@ -39,6 +42,7 @@
             overflow-x: hidden;
         }
 
+        /* Container Principal */
         .game-container {
             width: 100%;
             max-width: 900px;
@@ -54,6 +58,9 @@
             justify-content: center;
         }
 
+        /* ==========================================================================
+           2. ESTILOS DE PANTALLAS (MENU, INSTRUCCIONES, JUEGO, FIN)
+           ========================================================================== */
         .screen {
             display: none;
             flex-direction: column;
@@ -68,10 +75,11 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); } 
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
+        /* Títulos e Iconos */
         h1 {
             font-size: 2.8rem;
             color: var(--primary-blue);
@@ -92,6 +100,7 @@
             margin-bottom: 20px;
         }
 
+        /* BOTONES */
         .btn-group {
             display: flex;
             flex-direction: column;
@@ -134,6 +143,9 @@
             box-shadow: none;
         }
 
+        /* ==========================================================================
+           3. PANTALLAS ESPECÍFICAS (INSTRUCCIONES Y CREDITO)
+           ========================================================================== */
         .info-card {
             background: var(--light-blue);
             border-radius: 12px;
@@ -167,13 +179,17 @@
         }
 
         .info-card li::before {
-            content: "\2714";
+            content: "\u2714";
             position: absolute;
             left: 0;
             color: var(--dark-green);
             font-weight: bold;
         }
 
+        /* ==========================================================================
+           4. HUD Y TABLERO DE JUEGO
+           ========================================================================== */
+        /* Barra superior de estado */
         .hud {
             display: flex;
             justify-content: space-between;
@@ -200,6 +216,7 @@
             font-size: 1.3rem;
         }
 
+        /* Barra de progreso global */
         .progress-bar-container {
             width: 100%;
             height: 10px;
@@ -216,6 +233,7 @@
             transition: width 0.4s ease;
         }
 
+        /* Tablero gráfico */
         .board {
             display: grid;
             grid-template-columns: repeat(11, 1fr);
@@ -242,7 +260,7 @@
             border-color: var(--accent-blue);
             background: #d4e6f1;
             color: var(--primary-blue);
-            animation: pulse-active-tile 1s infinite alternate;
+            animation: pulse-active-tile 1s infinite alternate; /* New animation for active tile */
         }
 
         @keyframes pulse-active-tile {
@@ -265,19 +283,26 @@
             color: #d35400;
         }
 
+        /* Ficha del jugador */
         .player-token {
-            width: 28px;
-            height: 28px;
-            font-size: 24px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: absolute;
+            width: 28px; /* Increased size for emoji */
+            height: 28px; /* Increased size for emoji */
+            font-size: 24px; /* Size of the emoji */
+            display: flex; /* For centering emoji */
+            justify-content: center; /* For centering emoji */
+            align-items: center; /* For centering emoji */
+            /* background-color: var(--primary-blue); */ /* Removed for emoji */
+            /* border: 2px solid white; */ /* Removed for emoji */
+            border-radius: 0; /* Removed for emoji */
+            position: absolute; /* Set position absolute relative to board */
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-            transition: transform 0.4s ease;
-            z-index: 10;
+            transition: transform 0.4s ease; /* Animate transform directly */
+            z-index: 10; /* Ensure it's above tiles */
         }
 
+        /* ==========================================================================
+           5. PREGUNTAS Y TEMPORIZADOR
+           ========================================================================== */
         .quiz-container {
             width: 100%;
             background: #ffffff;
@@ -348,6 +373,7 @@
             color: #721c24 !important;
         }
 
+        /* Mensajes de retroalimentación */
         .feedback {
             margin-top: 15px;
             font-weight: bold;
@@ -369,6 +395,7 @@
             color: var(--error-red);
         }
 
+        /* Animación de sacudida para el contenedor de la pregunta */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
@@ -378,6 +405,9 @@
             animation: shake 0.5s ease-in-out;
         }
 
+        /* ==========================================================================
+           6. EFECTO CONFETI (JS/CSS VANILLA)
+           ========================================================================== */
         .confetti-container {
             position: absolute;
             top: 0;
@@ -391,8 +421,7 @@
 
         .confetti-piece {
             position: absolute;
-            width: 10px;
-            height: 20px;
+            width: 10px;            height: 20px;
             background: #ffd700;
             top: -20px;
             opacity: 0.8;
@@ -405,6 +434,9 @@
             }
         }
 
+        /* ==========================================================================
+           7. ADAPTABILIDAD RESPONSIVE (CELULARES)
+           ========================================================================== */
         @media (max-width: 600px) {
             .game-container {
                 padding: 15px;
@@ -443,8 +475,12 @@
 <body>
 
     <div class="game-container">
+        <!-- Capa para el efecto Confeti al ganar -->
         <div id="confetti" class="confetti-container"></div>
 
+        <!-- ==========================================================================
+             PANTALLA 1: MENÚ PRINCIPAL
+             ========================================================================== -->
         <div id="screen-main" class="screen active">
             <h1>PRESUPUESTO RACE</h1>
             <p class="subtitle">Demuestra tu conocimiento financiero y llega a la meta</p>
@@ -455,6 +491,9 @@
             </div>
         </div>
 
+        <!-- ==========================================================================
+             PANTALLA 2: INSTRUCCIONES
+             ========================================================================== -->
         <div id="screen-instructions" class="screen">
             <h2>Instrucciones</h2>
             <div class="info-card">
@@ -467,12 +506,17 @@
                     <li>Cada respuesta incorrecta (o agotamiento del tiempo) te resta una vida.</li>
                     <li>Cuentas con <strong>3 vidas</strong> y <strong>30 segundos</strong> por pregunta.</li>
                     <li>Si fallas, puedes volver a intentar la pregunta hasta lograrlo (siempre que tengas vidas).</li>
+                    <li>Cuentas con **3 vidas** y **30 segundos** por pregunta.</li>
+                    <li>Si fallas, puedes volver a intentar la pregunta hasta lograrlo (siempre que tengas vidas).</li>
                     <li>Gana el jugador que logre completar el recorrido de 10 casillas.</li>
                 </ul>
             </div>
             <button class="btn" onclick="showScreen('screen-main')">Volver al menú</button>
         </div>
 
+        <!-- ==========================================================================
+             PANTALLA 3: CRÉDITOS (PERSONALIZADO)
+             ========================================================================== -->
         <div id="screen-credits" class="screen">
             <h2>Información</h2>
             <div class="info-card" style="text-align: center;">
@@ -486,17 +530,23 @@
             <button class="btn" onclick="showScreen('screen-main')">Volver al menú</button>
         </div>
 
+        <!-- ==========================================================================
+             PANTALLA 4: JUEGO (TABLERO Y PREGUNTAS)
+             ========================================================================== -->
         <div id="screen-game" class="screen">
+            <!-- Barra de información general -->
             <div class="hud">
                 <div class="hud-item">Vidas: <span id="hearts-display" class="hearts">&#x2764;&#xFE0F;&#x2764;&#xFE0F;&#x2764;&#xFE0F;</span></div>
                 <div class="hud-item">Puntos: <span id="score-display">0</span></div>
                 <div class="hud-item"><button class="btn btn-secondary" style="padding: 4px 12px; font-size: 0.8rem;" onclick="resetGame()">Reiniciar</button></div>
             </div>
 
+            <!-- Barra de progreso general -->
             <div class="progress-bar-container">
                 <div id="progress-fill" class="progress-bar-fill"></div>
             </div>
 
+            <!-- Tablero gráfico (10 casillas + Inicio) -->
             <div class="board" id="board">
                 <div id="player-token" class="player-token">&#x1F3CE;</div>
                 <div class="tile start-tile active" id="tile-0">
@@ -514,18 +564,24 @@
                 <div class="tile finish-tile" id="tile-10">Meta</div>
             </div>
 
+            <!-- Contenedor de la pregunta activa -->
             <div class="quiz-container">
                 <div class="timer-container">
                     &#x23F1;&#xFE0F; Tiempo: <span id="timer-display">30</span>s
                 </div>
                 <div class="question-text" id="question-text">Cargando pregunta...</div>
                 <div class="options-grid" id="options-grid">
+                    <!-- Opciones generadas con JS -->
                 </div>
             </div>
 
+            <!-- Feedback de respuesta -->
             <div id="feedback-message" class="feedback"></div>
         </div>
 
+        <!-- ==========================================================================
+             PANTALLA 5: GAME OVER / FELICITACIONES
+             ========================================================================== -->
         <div id="screen-end" class="screen">
             <h1 id="end-title">&#x1F3C6; &#xA1;Felicidades!</h1>
             <p class="subtitle" id="end-message">Has administrado correctamente el presupuesto de la empresa.</p>
@@ -538,7 +594,11 @@
         </div>
     </div>
 
+    <!-- ==========================================================================
+         8. LÓGICA DE JUEGO (JAVASCRIPT)
+         ========================================================================== -->
     <script>
+        /* --- BANCO DE PREGUNTAS --- */
         const questions = [
             {
                 question: "&#xBF;Qué es un presupuesto?",
@@ -632,7 +692,240 @@
             }
         ];
 
+        /* --- ESTADO DEL JUEGO --- */
         let currentScreen = 'screen-main';
         let playerPosition = 0;
         let score = 0;
- 
+        let hearts = 3;
+        let currentQuestionIndex = 0;
+        let answeredQuestions = [];
+        let timerInterval;
+        const initialTime = 30;
+        let timeLeft = initialTime;
+
+        /* --- REFERENCIAS DEL DOM --- */
+        const screens = {
+            'screen-main': document.getElementById('screen-main'),
+            'screen-instructions': document.getElementById('screen-instructions'),
+            'screen-credits': document.getElementById('screen-credits'),
+            'screen-game': document.getElementById('screen-game'),
+            'screen-end': document.getElementById('screen-end')
+        };
+        const heartsDisplay = document.getElementById('hearts-display');
+        const scoreDisplay = document.getElementById('score-display');
+        const progressBarFill = document.getElementById('progress-fill');
+        const boardElement = document.getElementById('board');
+        const playerToken = document.getElementById('player-token');
+        const questionTextElement = document.getElementById('question-text');
+        const optionsGridElement = document.getElementById('options-grid');
+        const feedbackMessageElement = document.getElementById('feedback-message');
+        const timerDisplay = document.getElementById('timer-display');
+        const endTitle = document.getElementById('end-title');
+        const endMessage = document.getElementById('end-message');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const confettiContainer = document.getElementById('confetti');
+        const quizContainerElement = document.querySelector('.quiz-container'); // Added for shake animation
+
+        /* --- FUNCIONES DE CONTROL DE PANTALLAS --- */
+        function showScreen(screenId) {
+            Object.values(screens).forEach(screen => screen.classList.remove('active'));
+            screens[screenId].classList.add('active');
+            currentScreen = screenId;
+        }
+
+        /* --- FUNCIONES DE JUEGO --- */
+        function startGame() {
+            resetGame();
+            showScreen('screen-game');
+            loadNextQuestion();
+        }
+
+        function resetGame() {
+            playerPosition = 0;
+            score = 0;
+            hearts = 3;
+            currentQuestionIndex = 0;
+            answeredQuestions = [];
+            updateHUD();
+            updateBoard();
+            clearFeedback();
+            stopTimer();
+            hideConfetti();
+        }
+
+        function updateHUD() {
+            heartsDisplay.innerHTML = '&#x2764;&#xFE0F;'.repeat(hearts);
+            scoreDisplay.textContent = score;
+            progressBarFill.style.width = `${(playerPosition / 10) * 100}%`;
+        }
+
+        function updateBoard() {
+            // Remove 'active' class from all tiles
+            document.querySelectorAll('.tile').forEach(tile => tile.classList.remove('active'));
+
+            // Add 'active' class to the current player's tile
+            const currentTileElement = document.getElementById(`tile-${playerPosition}`);
+            if (currentTileElement) { // Ensure the tile exists
+                currentTileElement.classList.add('active');
+
+                // Calculate target position for the player token
+                // currentTileElement.offsetLeft and offsetTop are relative to the parent (board)
+                const tokenWidth = playerToken.offsetWidth;
+                const tokenHeight = playerToken.offsetHeight;
+
+                // Calculate X position: center of the tile minus half of token width
+                const targetX = currentTileElement.offsetLeft + (currentTileElement.offsetWidth / 2) - (tokenWidth / 2);
+                // Calculate Y position: top of the tile minus token height minus a small offset
+                const targetY = currentTileElement.offsetTop - tokenHeight - 5; // -5px to place it slightly above the tile
+
+                // Apply the transform for smooth animation
+                playerToken.style.transform = `translate(${targetX}px, ${targetY}px)`;
+            }
+        }
+
+        function loadNextQuestion() {
+            clearFeedback();
+            optionsGridElement.innerHTML = '';
+
+            if (currentQuestionIndex >= questions.length) {
+                endGame(true);
+                return;
+            }
+
+            const questionData = questions[currentQuestionIndex];
+            questionTextElement.innerHTML = questionData.question;
+
+            questionData.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.classList.add('option-btn');
+                button.innerHTML = option;
+                button.onclick = () => checkAnswer(index);
+                optionsGridElement.appendChild(button);
+            });
+
+            startTimer();
+        }
+
+        function startTimer() {
+            stopTimer();
+            timeLeft = initialTime;
+            timerDisplay.textContent = timeLeft;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    stopTimer();
+                    handleIncorrectAnswer();
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function checkAnswer(selectedIndex) {
+            stopTimer();
+            const questionData = questions[currentQuestionIndex];
+            const optionButtons = optionsGridElement.querySelectorAll('.option-btn');
+
+            optionButtons.forEach(btn => btn.disabled = true);
+
+            if (selectedIndex === questionData.correct) {
+                optionButtons[selectedIndex].classList.add('correct');
+                showFeedback('&#xA1;Correcto!', 'correct-text');
+                score += 10;
+                playerPosition++;
+                updateHUD();
+                updateBoard();
+
+                if (playerPosition >= 10) {
+                    document.getElementById('tile-10').classList.add('completed');
+                    setTimeout(() => endGame(true), 1000);
+                } else {
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        loadNextQuestion();
+                    }, 1500);
+                }
+            } else {
+                optionButtons[selectedIndex].classList.add('incorrect');
+                optionButtons[questionData.correct].classList.add('correct');
+                showFeedback('&#xA1;Incorrecto! Vuelve a intentarlo.', 'incorrect-text');
+                handleIncorrectAnswer();
+            }
+        }
+
+        function handleIncorrectAnswer() {
+            hearts--;
+            updateHUD();
+            // Add shake animation to the quiz container
+            quizContainerElement.classList.add('shake-animation');
+            // Remove animation after it completes to allow re-triggering
+            setTimeout(() => {
+                quizContainerElement.classList.remove('shake-animation');
+            }, 500); // The CSS animation is 0.5s
+
+            if (hearts <= 0) {
+                setTimeout(() => endGame(false), 1500);
+            } else {
+                setTimeout(() => {
+                    clearFeedback();
+                    const optionButtons = optionsGridElement.querySelectorAll('.option-btn');
+                    optionButtons.forEach(btn => {
+                        btn.disabled = false;
+                        btn.classList.remove('correct', 'incorrect');
+                    });
+                    startTimer();
+                }, 1500);
+            }
+        }
+
+        function showFeedback(message, className) {
+            feedbackMessageElement.innerHTML = message;
+            feedbackMessageElement.className = `feedback show ${className}`;
+        }
+
+        function clearFeedback() {
+            feedbackMessageElement.textContent = '';
+            feedbackMessageElement.className = 'feedback';
+        }
+
+        function endGame(won) {
+            showScreen('screen-end');
+            finalScoreDisplay.textContent = `${score} PTS`;
+
+            if (won) {
+                endTitle.innerHTML = '&#x1F3C6; &#xA1;Felicidades!';
+                endMessage.innerHTML = 'Has administrado correctamente el presupuesto de la empresa.';
+                showConfetti();
+            } else {
+                endTitle.innerHTML = 'Game Over';
+                endMessage.innerHTML = 'Te has quedado sin vidas. &#xA1;Mejor suerte la próxima vez!';
+            }
+        }
+
+        function showConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confettiPiece = document.createElement('div');
+                confettiPiece.classList.add('confetti-piece'); // Corrected class name
+                confettiPiece.style.left = `${Math.random() * 100}%`;
+                confettiPiece.style.animationDelay = `${Math.random() * 2}s`;
+                confettiPiece.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                confettiContainer.appendChild(confettiPiece);
+            }
+        }
+
+        function hideConfetti() {
+            confettiContainer.innerHTML = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen('screen-main');
+            updateHUD();
+            updateBoard();
+        });
+
+    </script>
+</body>
+</html>
